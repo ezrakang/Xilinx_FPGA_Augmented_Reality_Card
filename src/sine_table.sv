@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 `default_nettype none
 
+`include "iverilog_hack.svh"
+
 module sine_table #(
     parameter ROM_DEPTH=64,  // number of entries in sine ROM for 0° to 90°
     parameter ROM_WIDTH=8,   // width of sine ROM data in bits
@@ -36,16 +38,18 @@ module sine_table #(
     .dina(0),       // RAM input data, width determined from RAM_WIDTH
     .clka(clk),       // Clock
     .wea(0),         // Write enable
-    .ena(ena),         // RAM Enable, for additional power savings, disable port when not in use
+    .ena(1),         // RAM Enable, for additional power savings, disable port when not in use
     .rsta(rst),       // Output reset (does not affect memory contents)
-    .regcea(regcea),   // Output register enable
+    .regcea(1),   // Output register enable
     .douta(tab_data)      // RAM output data, width determined from RAM_WIDTH
   );
 
 
   logic [1:0] quad;  // quadrant we're in: I, II, III, IV
   always_comb begin
-      quad = id[ADDRW-1:ADDRW-2];
+      quad[1] = id > 179 ? 1 : 0;
+      quad[0] = (((id > 179) && (id<270)) || (id < 90)) ? 0 : 1;
+     // quad = id[ADDRW-1:ADDRW-2];
       case (quad)
           2'b00: tab_id = id[ADDRW-3:0];                //  I:    0° to  90°
           2'b01: tab_id = 2*ROM_DEPTH - id[ADDRW-3:0];  // II:   90° to 180°

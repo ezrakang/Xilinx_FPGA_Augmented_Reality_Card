@@ -82,7 +82,8 @@ endmodule
 // The following is an instantiation template for xilinx_single_port_ram_read_first
 /*
   //  Xilinx Single Port Read First RAM
-
+  xilinx_single_port_ram_read_first #(
+    .RAM_WIDTH(18),                       // Specify RAM data width
     .RAM_DEPTH(1024),                     // Specify RAM depth (number of entries)
     .RAM_PERFORMANCE("HIGH_PERFORMANCE"), // Select "HIGH_PERFORMANCE" or "LOW_LATENCY" 
     .INIT_FILE(`FPATH(data.mem))          // Specify name/location of RAM initialization file if using one (leave blank if not)
