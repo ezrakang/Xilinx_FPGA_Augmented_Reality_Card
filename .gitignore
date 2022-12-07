@@ -3,3 +3,4 @@ sine2fmem.py
 *.vcd
 *.swp
 *.py
+3d_to_2d_old.sv
