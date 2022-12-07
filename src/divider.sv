@@ -8,9 +8,10 @@ module divider #(parameter WIDTH = 9) (input wire clk_in,
                 input wire data_valid_in,
                 output logic[WIDTH-1:0] quotient_out,
                 output logic[WIDTH-1:0] remainder_out,
-                output logic data_valid_out,
-                output logic error_out,
-                output logic busy_out);
+                output logic data_valid_out
+                //output logic error_out,
+                //output logic busy_out);
+                );
 
   logic [8:0] p[8:0]; //32 stages
   logic [8:0] dividend [8:0];

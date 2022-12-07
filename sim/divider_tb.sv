@@ -34,9 +34,9 @@ module divider_tb;
     .data_valid_in(valid_in),
     .quotient_out(quotient),
     .remainder_out(remainder),
-    .data_valid_out(valid_out),
-    .error_out(error_out),
-    .busy_out(busy_out)
+    .data_valid_out(valid_out)
+    //.error_out(error_out),
+    //.busy_out(busy_out)
   );
 
   always begin

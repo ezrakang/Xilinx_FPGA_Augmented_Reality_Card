@@ -62,13 +62,13 @@ module 3d_to_2d #(
     .id(theta_cos),
     .rst(rst),
     .clk(clk),
-    .data(cos_val)
-  );
+       .data(cos_val)
+     );
 
-  logic signed [5:0] v1 [2:0];
-  logic signed [5:0] v2 [2:0];
-  logic signed [5:0] v3 [2:0];
-  logic signed [6:0] camera_pos [2:0];
+     logic signed [5:0] v1 [2:0];
+     logic signed [5:0] v2 [2:0];
+     logic signed [5:0] v3 [2:0];
+     logic signed [6:0] camera_pos [2:0];
 
   always_comb begin
     v1[0] = $signed(model_in[63:58])
@@ -92,7 +92,7 @@ module 3d_to_2d #(
   logic signed [7:0] v2_sub [2:0];
   logic signed [7:0] v3_sub [2:0];
 
-  subtract (
+  subtract sub (
     .v1(v1),
     .v2(v2),
     .v3(v3),
@@ -102,11 +102,75 @@ module 3d_to_2d #(
     .v3_out(v3_sub)
   )
  
-  
+  logic signed [8:0] v1_mul [2:0];
+  logic signed [8:0] v2_mul [2:0];
+  logic signed [8:0] v3_mul [2:0];
 
+  multiply mul (
+    .v1(v1_sub_pipe[2]),
+    .v2(v2_sub_pipe[2]),
+    .v3(v3_sub_pipe[2]),
+    .sin_val(sin_val),
+    .cos_val(cos_val),
+    .v1_out(v1_mul),
+    .v2_out(v2_mul),
+    .v3_out(v3_mul)
+  )
+
+  logic [8:0] x_y [5:0];
+  logic [8:0] z [2:0];
+  logic negate [5:0];
+
+  always_comb begin
+    x_y[0] = (v1_mul_pipe[0][8]) ? (~v1_mul_pipe[0][8]+1) : v1_mul_pipe[0][8];
+    x_y[1] = (v1_mul_pipe[1][8]) ? (~v1_mul_pipe[1][8]+1) : v1_mul_pipe[1][8];
+    x_y[2] = (v2_mul_pipe[0][8]) ? (~v1_mul_pipe[0][8]+1) : v1_mul_pipe[0][8];
+    x_y[3] = (v2_mul_pipe[1][8]) ? (~v1_mul_pipe[1][8]+1) : v1_mul_pipe[1][8];
+    x_y[4] = (v3_mul_pipe[0][8]) ? (~v1_mul_pipe[0][8]+1) : v1_mul_pipe[0][8];
+    x_y[5] = (v3_mul_pipe[1][8]) ? (~v1_mul_pipe[1][8]+1) : v1_mul_pipe[1][8];
+
+    z[0] = v1_mul_pipe[2];
+    z[1] = v2_mul_pipe[2];
+    z[2] = v3_mul_pipe[2];
+
+    negate[0] = (v1_mul_pipe[0][8]);
+    negate[1] = (v1_mul_pipe[1][8]);
+    negate[2] = (v2_mul_pipe[0][8]);
+    negate[3] = (v2_mul_pipe[1][8]);
+    negate[4] = (v3_mul_pipe[0][8]);
+    negate[5] = (v3_mul_pipe[1][8]);
+  end
+
+  logic [8:0] divide_out [5:0]
+ 
+  divide_top #(
+    .SIZE(6),
+    .WIDITH(9)
+  ) divider (
+    .clk(clk),
+    .rst(rst),
+    .dividend(x_y),
+    .divisor(z),
+    .quotient(divide_out);
+  )
+ 
+
+  logic signed [7:0] v1_sub_pipe [2:0][2:0];
+  logic signed [7:0] v2_sub_pipe [2:0][2:0];
+  logic signed [7:0] v3_sub_pipe [2:0][2:0];
+  logic signed [8:0] v1_mul_pipe [2:0];
+  logic signed [8:0] v2_mul_pipe [2:0];
+  logic signed [8:0] v3_mul_pipe [2:0];
+  logic [5:0] negate_pipe [5:0];
  
   always_ff @(posedge clk) begin
+    if (rst) begin
 
+
+    end else begin
+       
+
+    end
   end
 
 endmodule
