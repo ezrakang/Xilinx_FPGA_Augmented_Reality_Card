@@ -66,7 +66,7 @@ module divider_tb;
     #20;
 
 
-    for (int i=0; i<10; i=i+1) begin
+    for (int i=0; i<15; i=i+1) begin
       valid_in = 0;
       $display("valid out ", valid_out);
       $display("quotient out ", quotient);

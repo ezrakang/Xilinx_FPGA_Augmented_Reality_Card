@@ -46,14 +46,14 @@ module divider #(parameter WIDTH = 9) (input wire clk_in,
   end
 
   always_ff @(posedge clk_in)begin
-    if (rst_in) begin
-      for (int i=0; i<9; i=i+1) begin
-        p[i] <= 0;
-        dividend[i] <= 0;
-        divisor[i] <= 0;
-        data_valid[i] <= 0;
-      end
-    end else begin
+   // if (rst_in) begin
+   //   for (int i=0; i<9; i=i+1) begin
+   //     p[i] <= 0;
+   //     dividend[i] <= 0;
+   //     divisor[i] <= 0;
+   //     data_valid[i] <= 0;
+   //   end
+   // end else begin
       for (int i=1; i<9; i=i+2)begin
         data_valid[i] <= data_valid[i-1];
         if ({p[i-1][7:0],dividend[i-1][8]}>=divisor[i-1][8:0])begin
@@ -66,7 +66,7 @@ module divider #(parameter WIDTH = 9) (input wire clk_in,
         divisor[i] <= divisor[i-1];
       end
     end
-  end
+  //end
 endmodule
 
 `default_nettype wire

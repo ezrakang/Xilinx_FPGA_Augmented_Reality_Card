@@ -2,15 +2,15 @@
 `default_nettype none
 
 module subtract(
-      input signed wire [5:0] v1 [2:0],
-      input signed wire [5:0] v2 [2:0],
-      input signed wire [5:0] v3 [2:0],
-      input signed wire [6:0] cam_pos [2:0],
+      input wire signed [5:0] v1 [2:0],
+      input wire signed [5:0] v2 [2:0],
+      input wire signed [5:0] v3 [2:0],
+      input wire signed [6:0] cam_pos [2:0],
 
-      output signed logic [7:0] v1_out [2:0],
-      output signed logic [7:0] v2_out [2:0],
-      output signed logic [7:0] v3_out [2:0]
-      )
+      output logic signed [7:0] v1_out [2:0],
+      output logic signed [7:0] v2_out [2:0],
+      output logic signed [7:0] v3_out [2:0]
+      );
 
   always_comb begin
     for (int i=0; i<3; i=i+1) begin

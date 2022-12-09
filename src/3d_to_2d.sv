@@ -107,9 +107,9 @@ module 3d_to_2d #(
   logic signed [8:0] v3_mul [2:0];
 
   multiply mul (
-    .v1(v1_sub_pipe[2]),
-    .v2(v2_sub_pipe[2]),
-    .v3(v3_sub_pipe[2]),
+    .v1(v1_sub_pipe),
+    .v2(v2_sub_pipe),
+    .v3(v3_sub_pipe),
     .sin_val(sin_val),
     .cos_val(cos_val),
     .v1_out(v1_mul),
@@ -170,8 +170,30 @@ module 3d_to_2d #(
  
   always_ff @(posedge clk) begin
     if (rst) begin
+      for(int i; i<3; i=i+1) begin
+        camera_pos_pipe[i][0] <= 0;
+        camera_pos_pipe[i][1] <= 0;
+        camera_pos_pipe[i][2] <= 0;
 
-
+        v1_sub_pipe[i] <= 0;
+        v2_sub_pipe[i] <= 0;
+        v3_sub_pipe[i] <= 0;
+        v1_mul_pipe[i] <= 0;
+        v2_mul_pipe[i] <= 0;
+        v3_mul_pipe[i] <= 0;
+        z_max_pipe[i] <= 0;
+        negate_pipe[i] <= 0;
+      end
+      for (int i; i<7; i=i+1) begin
+        valid_pipe[i] <= 0;
+      end
+      for (int i; i<5; i=i+1) begin
+        color[i] <= 0;
+      end
+      sin_pipe[0] <= 0;
+      sin_pipe[1] <= 0;
+      cos_pipe[0] <= 0;
+      cos_pipe[1] <= 0;
     end else begin
       //TODO add rasterize busy_out to pause pipelines
       
