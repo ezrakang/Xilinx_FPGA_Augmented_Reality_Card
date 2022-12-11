@@ -12,7 +12,7 @@ module divider_top #(
       output logic [WIDTH-1:0] quotient [SIZE-1:0]
       );
   
-  //remove these ports
+
   logic [WIDTH-1:0] valid_out; 
   logic [WIDTH-1:0] remainder_out;
 

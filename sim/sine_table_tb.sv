@@ -57,16 +57,16 @@ module sine_table_tb;
     $display("data top half ", data[15:8]);
     $display("data bottom half ", data[7:0]);
     
-    $display("test 3: sin(90) should be ");
-    id = 90;
+    $display("test 3: sin(135) should be ");
+    id = 135;
     #60;
     $display("checking data out");
     $display("%b", data[7:0]);
     $display("data top half ", data[15:8]);
     $display("data bottom half ", data[7:0]);
     
-    $display("test 4: sin(225)");
-    id = 225;
+    $display("test 4: sin(315)");
+    id = 315;
     #60;
     $display("checking data out");
     $display("top half %b", data[15:8]);
