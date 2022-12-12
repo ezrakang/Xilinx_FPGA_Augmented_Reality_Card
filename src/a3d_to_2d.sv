@@ -278,7 +278,7 @@ module a3d_to_2d #(
       model_out[18:10] <= z_max_pipe[2];
       model_out[54:49] <= negate_pipe[2][5] ? negate_divide[0][5:0] : divide_out[0][5:0]; //v1x
       model_out[48:43] <= negate_pipe[2][4] ? negate_divide[1][5:0] : divide_out[1][5:0]; //v1y 
-      model_out[43:37] <= negate_pipe[2][3] ? negate_divide[2][5:0] : divide_out[2][5:0]; //v2x
+      model_out[42:37] <= negate_pipe[2][3] ? negate_divide[2][5:0] : divide_out[2][5:0]; //v2x
       model_out[36:31] <= negate_pipe[2][2] ? negate_divide[3][5:0] : divide_out[3][5:0]; //v2y
       model_out[30:25] <= negate_pipe[2][1] ? negate_divide[4][5:0] : divide_out[4][5:0]; //v3x
       model_out[24:19] <= negate_pipe[2][0] ? negate_divide[5][5:0] : divide_out[5][5:0]; //v3y

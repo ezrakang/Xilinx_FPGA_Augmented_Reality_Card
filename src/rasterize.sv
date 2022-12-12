@@ -1,22 +1,23 @@
 `timescale 1ns / 1ps
 `default_nettype none
 
-`define V1X 63:58
-`define V1Y 57:52
-`define V1Z 51:46
-`define V2X 45:40
-`define V2Y 39:34
-`define V3X 27:22
-`define V3Y 21:16
+`define V1X 54:49
+`define V1Y 48:43
+`define V2X 42:37
+`define V2Y 36:31
+`define V3X 30:25
+`define V3Y 24:19
+`define MAXZ 18:10
+
 
 module rasterize(
       input wire clk,
       input wire rst,
       input wire valid_in,
-      input wire [63:0] model_in,
+      input wire [54:0] model_in,
 
       output logic valid,
-      output logic [27:0] pixel_out);
+      output logic [30:0] pixel_out);
 
   localparam WAITING = 0;
   localparam RASTERIZE = 1;
@@ -46,10 +47,10 @@ module rasterize(
     y_2 = $signed(model_in[`V2Y]);
     y_3 = $signed(model_in[`V3Y]);
             
-    x_min = x_1 > x_2 ? (x_2 > x_3 ? x_3: x_1) : (x_1 > x_3 ? x_2 : x_1);
-    y_min = y_1 > y_2 ? (y_2 > y_3 ? y_3: y_1) : (y_1 > y_3 ? y_2 : y_3);
-    x_max = x_1 > x_2 ? (x_1 > x_3 ? x_1: x_3) : (x_2 > x_3 ? x_2 : x_3);
-    y_max = y_1 > y_2 ? (y_1 > y_3 ? y_1: y_3) : (y_2 > y_3 ? y_2 : y_3);
+    x_min = ($signed(x_1) > $signed(x_2)) ? ($signed(x_2) > $signed(x_3) ? $signed(x_3) : $signed(x_2)) : ($signed(x_1) > $signed(x_3) ? $signed(x_3) : $signed(x_1));
+    y_min = ($signed(y_1) > $signed(y_2)) ? ($signed(y_2) > $signed(y_3) ? $signed(y_3) : $signed(y_2)) : ($signed(y_1) > $signed(y_3) ? $signed(y_3) : $signed(y_1));
+    x_max = ($signed(x_1) > $signed(x_2)) ? ($signed(x_1) > $signed(x_3) ? $signed(x_1) : $signed(x_3)) : ($signed(x_2) > $signed(x_3) ? $signed(x_2) : $signed(x_3));
+    y_max = ($signed(y_1) > $signed(y_2)) ? ($signed(y_1) > $signed(y_3) ? $signed(y_1) : $signed(y_3)) : ($signed(y_2) > $signed(y_3) ? $signed(y_2) : $signed(y_3));
     //e1 uses v1, v2
     E_1[0] = $signed(model_in[`V1Y]) - $signed(model_in[`V2Y]);
     E_1[1] = $signed(model_in[`V2X]) - $signed(model_in[`V1X]);
@@ -70,14 +71,7 @@ module rasterize(
   logic signed [15:0] check_2;
   logic signed [15:0] check_3;
  
-  logic [6:0] e1a;
-  logic [6:0] e1b;
-  logic [6:0] e1c;
- 
   always_comb begin
-    e1a = E1[0];
-    e1b = E1[1];
-    e1c = E1[2];
     check_1 = $signed(E1[0])*$signed(x_curr) + $signed(E1[1])*$signed(y_curr) + $signed(E1[2]);
     check_2 = $signed(E2[0])*$signed(x_curr) + $signed(E2[1])*$signed(y_curr) + $signed(E2[2]);
     check_3 = $signed(E3[0])*$signed(x_curr) + $signed(E3[1])*$signed(y_curr) + $signed(E3[2]);
@@ -85,9 +79,12 @@ module rasterize(
 
   logic [5:0] x;
   logic [5:0] y;
+  logic signed [5:0] y_flipped;
   always_comb begin
+      y_flipped = $signed(~y_curr+1);
+
       x = $signed(x_curr) + 'sd32;
-      y = $signed(y_curr) + 'sd32;
+      y = $signed(y_flipped) + 'sd32;
   end
 
   logic state;
@@ -100,7 +97,7 @@ module rasterize(
   logic signed [5:0] xmax;
   logic signed [5:0] ymin;
   logic signed [5:0] ymax;
-  logic [5:0] z;
+  logic [8:0] z;
   logic [9:0] color;
  
   always_ff @(posedge clk) begin
@@ -156,7 +153,7 @@ module rasterize(
             xmax <= x_max;
             ymin <= y_min;
             ymax <= y_max;
-            z <= model_in[`V1Z];
+            z <= model_in[`MAXZ];
             color <= model_in[9:0];
           end
           valid <= 0;

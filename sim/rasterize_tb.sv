@@ -6,10 +6,10 @@ module rasterize_tb;
   logic rst;
 
   logic valid_in;
-  logic [63:0] model_in;
+  logic [54:0] model_in;
 
   logic valid_out;
-  logic [27:0] pixel_out;
+  logic [30:0] pixel_out;
   /* A quick note about this simulation! Most waveform viewers
    * (including GTKWave) don't display arrays in their output
    * unless the array is packed along all dimensions. This is
@@ -45,7 +45,7 @@ module rasterize_tb;
 
     $display("test 1:");
     valid_in = 1;
-    model_in = 64'h0410C21000C10003;
+    model_in = 55'b000_0000_0000_0000_0101_1111_1000_0010_0000_1000_0001_0000_0000_0011;
     for (int i=0; i<10; i=i+1) begin
       #20;
       valid_in = 0;

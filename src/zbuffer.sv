@@ -5,12 +5,12 @@
 
 module zbuffer#(
       parameter SIZE = 64,
-      parameter WIDTH = 6
+      parameter WIDTH = 9
 ) (
       input wire clk,
       input wire rst,
       input wire valid_in,
-      input wire [27:0] pixel_in,
+      input wire [30:0] pixel_in,
 
       output wire valid_out,
       output logic [$clog2(SIZE*SIZE)-1:0] pixel_addr,
@@ -18,12 +18,12 @@ module zbuffer#(
 );
 
   logic [$clog2(SIZE*SIZE)-1:0] addr;
-  logic [5:0] depth_out;
+  logic [8:0] depth_out;
   logic write_ena;
-  logic [5:0] depth_in;
+  logic [8:0] depth_in;
   logic data_outb;
 
-  assign addr = (pixel_in[27:22] + pixel_in[21:16]*SIZE);
+  assign addr = (pixel_in[30:25] + pixel_in[24:19]*SIZE);
       
   xilinx_true_dual_port_read_first_clock_ram #(
     .RAM_WIDTH(WIDTH),
