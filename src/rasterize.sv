@@ -16,6 +16,7 @@ module rasterize(
       input wire valid_in,
       input wire [54:0] model_in,
 
+      output logic busy_out,
       output logic valid,
       output logic [30:0] pixel_out);
 
@@ -100,6 +101,7 @@ module rasterize(
   logic [8:0] z;
   logic [9:0] color;
  
+
   always_ff @(posedge clk) begin
     if (rst) begin
       state <= 0;
@@ -112,6 +114,7 @@ module rasterize(
       ymax <= 0;
       color <= 0;
       z <= 0;
+      busy_out <= 0;
       for (int i=0; i<3; i=i+1) begin
         E1[i] <= 0;
         E2[i] <= 0;
@@ -135,6 +138,7 @@ module rasterize(
               E3[1] <= (~($signed(E_3[1]))) + 'sd1;
               E3[2] <= (~($signed(E_3[2]))) + 'sd1;
               state <= RASTERIZE;
+              busy_out <= 1;
             end else begin
               E1[0] <= E_1[0];
               E1[1] <= E_1[1];
@@ -146,6 +150,7 @@ module rasterize(
               E3[1] <= E_3[1];
               E3[2] <= E_3[2];
               state <= RASTERIZE;
+              busy_out <= 1;
             end
             x_curr <= x_min;
             y_curr <= y_min;
@@ -167,6 +172,7 @@ module rasterize(
           end
           if (x_curr == xmax && y_curr == ymax) begin
             state <= WAITING;
+            busy_out <= 0;
           end else if (x_curr == xmax) begin
             x_curr <= xmin;
             y_curr <= $signed(y_curr) + 'sd1;

@@ -46,10 +46,11 @@ module top_level(
   logic camera_loc_valid_in;
   assign camera_loc_valid_in = 1;
   //camera loc
-  assign camera_loc = 30'b000110101000001000001000000000;
+  assign camera_loc = 30'b00_0000_0000_1111_1100_0000_0000_0000;
 
   logic model_out_valid;
   logic [54:0] model_out;
+  logic raster_busy_in;
   a3d_to_2d #(
       .SIZE(1),
       .MODEL_FILE("basic_model.mem"),
@@ -57,6 +58,7 @@ module top_level(
   ) a3d_to_2d (
       .clk(clk_65mhz),
       .rst(sys_rst),
+      .raster_busy(raster_busy_in),
       .valid_in(camera_loc_valid_in),
       .camera_loc(camera_loc),
       .valid_out(model_out_valid),
@@ -72,6 +74,7 @@ module top_level(
       .rst(sys_rst),
       .valid_in(model_out_valid),
       .model_in(model_out),
+      .busy_out(raster_busy_in),
       .valid(rasterize_valid),
       .pixel_out(pixel_out)
   );

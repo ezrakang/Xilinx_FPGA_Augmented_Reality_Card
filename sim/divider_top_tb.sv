@@ -5,11 +5,11 @@ module divider_top_tb;
   logic clk;
   logic rst;
 
-  logic [8:0] dividend [5:0];
-  logic [8:0] divisor [2:0];
+  logic [13:0] dividend [5:0];
+  logic [13:0] divisor [2:0];
 
-  logic [8:0] quotient [5:0];
-
+  logic [13:0] quotient [5:0];
+  logic pause;
   /* A quick note about this simulation! Most waveform viewers
    * (including GTKWave) don't display arrays in their output
    * unless the array is packed along all dimensions. This is
@@ -20,14 +20,15 @@ module divider_top_tb;
 
   divider_top #(
     .SIZE(6),
-    .WIDTH(9)
+    .WIDTH(14)
   ) uut (
     .clk(clk),
     .rst(rst),
     .dividend(dividend),
     .divisor(divisor),
     //.data_valid_in(valid_in),
-    .quotient(quotient)
+    .quotient(quotient),
+    .pause(pause)
     //.remainder_out(remainder),
     //.data_valid_out(valid_out)
     //.error_out(error_out),
@@ -45,22 +46,27 @@ module divider_top_tb;
     $display("Starting Sim");
     clk = 0;
     rst = 0;
+    pause = 0;
     #20;
     rst = 1;
     #20;
     rst = 0;
 
     $display("test 1: simple test 64/3, 20/3, 41/1, 1/1, 18/7, 50/7");
-    dividend[0] = 9'd64;
-    dividend[1] = 9'd20;
-    dividend[2] = 9'd41;
-    dividend[3] = 9'd1;
-    dividend[4] = 9'd18;
-    dividend[5] = 9'd50;
-    divisor[0] = 9'd3;
-    divisor[1] = 9'd1;
-    divisor[2] = 9'd7;
+    
+    dividend[0] = 14'd64;
+    dividend[1] = 14'd20;
+    dividend[2] = 14'd41;
+    dividend[3] = 14'd1;
+    dividend[4] = 14'd18;
+    dividend[5] = 14'd50;
+    divisor[0] = 14'd3;
+    divisor[1] = 14'd1;
+    divisor[2] = 14'd7;
     #40;
+    pause = 1;
+    #20;
+    pause = 0;
 
     for (int i=0; i<10; i=i+1) begin
       $display("64/3 ", quotient[0]);
