@@ -43,8 +43,8 @@ module a3d_to_2d #(
 
   logic [8:0] theta;
   assign theta = camera_loc[29:21];
-  assign theta_cos = 9'd360 - theta;
-  assign theta_sin = (theta > 9'd270) ? 10'd630 - theta : 9'd270 - theta;
+  assign theta_cos = theta + 7'd90;
+  assign theta_sin = theta;
   
   sine_table #(
     .ROM_DEPTH(90),
@@ -126,20 +126,20 @@ module a3d_to_2d #(
   logic [5:0] negate;
 
   always_comb begin
-    x_y[0] = (v1_mul_pipe[0][13]) ? (~v1_mul_pipe[0]+1) : v1_mul_pipe[0];
-    x_y[1] = (v1_mul_pipe[1][13]) ? (~v1_mul_pipe[1]+1) : v1_mul_pipe[1];
-    x_y[2] = (v2_mul_pipe[0][13]) ? (~v2_mul_pipe[0]+1) : v2_mul_pipe[0];
-    x_y[3] = (v2_mul_pipe[1][13]) ? (~v2_mul_pipe[1]+1) : v2_mul_pipe[1];
-    x_y[4] = (v3_mul_pipe[0][13]) ? (~v3_mul_pipe[0]+1) : v3_mul_pipe[0];
-    x_y[5] = (v3_mul_pipe[1][13]) ? (~v3_mul_pipe[1]+1) : v3_mul_pipe[1];
+    x_y[0] = (v1_mul_pipe[0][13]) ? ((~v1_mul_pipe[0]+1) << 5) : (v1_mul_pipe[0] << 5);
+    x_y[1] = (v1_mul_pipe[1][13]) ? ((~v1_mul_pipe[1]+1) << 5) : (v1_mul_pipe[1] << 5);
+    x_y[2] = (v2_mul_pipe[0][13]) ? ((~v2_mul_pipe[0]+1) << 5) : (v2_mul_pipe[0] << 5);
+    x_y[3] = (v2_mul_pipe[1][13]) ? ((~v2_mul_pipe[1]+1) << 5) : (v2_mul_pipe[1] << 5);
+    x_y[4] = (v3_mul_pipe[0][13]) ? ((~v3_mul_pipe[0]+1) << 5) : (v3_mul_pipe[0] << 5);
+    x_y[5] = (v3_mul_pipe[1][13]) ? ((~v3_mul_pipe[1]+1) << 5) : (v3_mul_pipe[1] << 5);
 
     z[0] = (v1_mul_pipe[2] < 1) ? 1: v1_mul_pipe[2];
     z[1] = (v2_mul_pipe[2] < 1) ? 1: v2_mul_pipe[2];
     z[2] = (v3_mul_pipe[2] < 1) ? 1: v3_mul_pipe[2];
 
     //negate = {v1x, v1y, v2x, v2y, v3x, v3y}
-    negate = {v1_mul_pipe[0][8], v1_mul_pipe[1][8], v2_mul_pipe[0][8], v2_mul_pipe[1][8],
-              v3_mul_pipe[0][8], v3_mul_pipe[1][8]};
+    negate = {v1_mul_pipe[0][13], v1_mul_pipe[1][13], v2_mul_pipe[0][13], v2_mul_pipe[1][13],
+              v3_mul_pipe[0][13], v3_mul_pipe[1][13]};
 
     z_max = (z[0] > z[1]) ? ((z[0] > z[2]) ? z[0] : z[2]) : ((z[1] > z[2]) ? z[1] : z[2]);
 
@@ -180,9 +180,9 @@ module a3d_to_2d #(
   logic signed [7:0] v1_sub_pipe [2:0];
   logic signed [7:0] v2_sub_pipe [2:0];
   logic signed [7:0] v3_sub_pipe [2:0];
-  logic signed [8:0] v1_mul_pipe [2:0];
-  logic signed [8:0] v2_mul_pipe [2:0];
-  logic signed [8:0] v3_mul_pipe [2:0];
+  logic signed [13:0] v1_mul_pipe [2:0];
+  logic signed [13:0] v2_mul_pipe [2:0];
+  logic signed [13:0] v3_mul_pipe [2:0];
   logic [8:0] z_max_pipe [5:0];
   logic [5:0] negate_pipe [5:0];
  
@@ -269,7 +269,7 @@ module a3d_to_2d #(
         negate_pipe[0] <= negate;
         z_max_pipe[0] <= z_max;
         for (int i=1; i<6; i=i+1) begin
-          negate_pipe[i] <= negate[i-1];
+          negate_pipe[i] <= negate_pipe[i-1];
           z_max_pipe[i] <= z_max_pipe[i-1];
 
         end
@@ -277,9 +277,15 @@ module a3d_to_2d #(
 
         valid_out <= valid_pipe[6];
         //build model out
-        //model_out[8:0] <= v2_mul_pipe[0];
-        //model_out[17:9] <= v2_mul_pipe[1];
-        //model_out[26:18] <= v2_mul_pipe[2];
+        //model_out[8:0] <= v3_sub_pipe[0];
+        //model_out[17:9] <= v3_sub_pipe[1];
+        //model_out[26:18] <= v3_sub_pipe[2];
+
+
+        //model_out[13:0] <= v3_mul_pipe[0];
+        //model_out[27:14] <= v3_mul_pipe[1];
+        //model_out[41:28] <= v3_mul_pipe[2];
+        
         model_out[9:0] <= color[7];
         model_out[18:10] <= z_max_pipe[2];
         model_out[54:49] <= negate_pipe[2][5] ? negate_divide[0][5:0] : divide_out[0][5:0]; //v1x
