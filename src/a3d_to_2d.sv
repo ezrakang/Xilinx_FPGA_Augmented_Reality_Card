@@ -99,7 +99,7 @@ module a3d_to_2d #(
     .v1(v1),
     .v2(v2),
     .v3(v3),
-    .cam_pos(camera_pos_pipe[2]),
+    .cam_pos(camera_pos_pipe[1]),
     .v1_out(v1_sub),
     .v2_out(v2_sub),
     .v3_out(v3_sub)
@@ -113,8 +113,8 @@ module a3d_to_2d #(
     .v1(v1_sub_pipe),
     .v2(v2_sub_pipe),
     .v3(v3_sub_pipe),
-    .sin_val(sin_pipe[1]),
-    .cos_val(cos_pipe[1]),
+    .sin_val(sin_pipe),
+    .cos_val(cos_pipe),
     .v1_out(v1_mul),
     .v2_out(v2_mul),
     .v3_out(v3_mul)
@@ -170,13 +170,13 @@ module a3d_to_2d #(
   end
 
   logic pause;
-  assign pause = (raster_busy && valid_pipe[6]);
+  assign pause = (raster_busy && valid_pipe[9]);
 
   logic valid_pipe [9:0];
-  logic signed [6:0] camera_pos_pipe [2:0][2:0];
+  logic signed [6:0] camera_pos_pipe [1:0][2:0];
   logic [9:0] color [7:0];
-  logic signed [15:0] sin_pipe [1:0];
-  logic signed [15:0] cos_pipe [1:0];
+  logic signed [15:0] sin_pipe;
+  logic signed [15:0] cos_pipe;
   logic signed [7:0] v1_sub_pipe [2:0];
   logic signed [7:0] v2_sub_pipe [2:0];
   logic signed [7:0] v3_sub_pipe [2:0];
@@ -188,11 +188,13 @@ module a3d_to_2d #(
  
   always_ff @(posedge clk) begin
     if (rst) begin
+      camera_pos_pipe[0][0] <= 0;
+      camera_pos_pipe[0][1] <= 0;
+      camera_pos_pipe[0][2] <= 0;
+      camera_pos_pipe[1][0] <= 0;
+      camera_pos_pipe[1][1] <= 0;
+      camera_pos_pipe[1][2] <= 0;
       for(int i=0; i<3; i=i+1) begin
-        camera_pos_pipe[i][0] <= 0;
-        camera_pos_pipe[i][1] <= 0;
-        camera_pos_pipe[i][2] <= 0;
-
         v1_sub_pipe[i] <= 0;
         v2_sub_pipe[i] <= 0;
         v3_sub_pipe[i] <= 0;
@@ -211,11 +213,10 @@ module a3d_to_2d #(
       for (int i=0; i<8; i=i+1) begin
         color[i] <= 0;
       end
-      sin_pipe[0] <= 0;
-      sin_pipe[1] <= 0;
-      cos_pipe[0] <= 0;
-      cos_pipe[1] <= 0;
+      sin_pipe <= 0;
+      cos_pipe <= 0;
     end else begin
+      valid_out <= pause ? 0 : valid_pipe[9];
       if (!(pause)) begin
         if (valid_in) begin
           if (addr_in < SIZE-1) begin
@@ -236,10 +237,9 @@ module a3d_to_2d #(
         camera_pos_pipe[0][1] <= camera_pos[1];
         camera_pos_pipe[0][2] <= camera_pos[2];
 
-        for (int i=0; i<3; i=i+1) begin
-          camera_pos_pipe[1][i] <= camera_pos_pipe[0][i];
-          camera_pos_pipe[2][i] <= camera_pos_pipe[1][i];
-        end
+        camera_pos_pipe[1][0] <= camera_pos_pipe[0][0];
+        camera_pos_pipe[1][1] <= camera_pos_pipe[0][1];
+        camera_pos_pipe[1][2] <= camera_pos_pipe[0][2];
 
         //pipeline model color
         color[0] <= model_in[9:0];
@@ -248,10 +248,8 @@ module a3d_to_2d #(
         end
 
         //pipeline sin and cos vals
-        sin_pipe[0] <= sin_val;
-        sin_pipe[1] <= sin_pipe[0];
-        cos_pipe[0] <= cos_val;
-        cos_pipe[1] <= cos_pipe[0];
+        sin_pipe <= sin_val;
+        cos_pipe <= cos_val;
 
         //pipeline sub stage
         for (int i=0; i<3; i=i+1) begin
@@ -274,8 +272,6 @@ module a3d_to_2d #(
 
         end
   
-
-        valid_out <= valid_pipe[6];
         //build model out
         //model_out[8:0] <= v3_sub_pipe[0];
         //model_out[17:9] <= v3_sub_pipe[1];
@@ -287,13 +283,13 @@ module a3d_to_2d #(
         //model_out[41:28] <= v3_mul_pipe[2];
         
         model_out[9:0] <= color[7];
-        model_out[18:10] <= z_max_pipe[2];
-        model_out[54:49] <= negate_pipe[2][5] ? negate_divide[0][5:0] : divide_out[0][5:0]; //v1x
-        model_out[48:43] <= negate_pipe[2][4] ? negate_divide[1][5:0] : divide_out[1][5:0]; //v1y 
-        model_out[42:37] <= negate_pipe[2][3] ? negate_divide[2][5:0] : divide_out[2][5:0]; //v2x
-        model_out[36:31] <= negate_pipe[2][2] ? negate_divide[3][5:0] : divide_out[3][5:0]; //v2y
-        model_out[30:25] <= negate_pipe[2][1] ? negate_divide[4][5:0] : divide_out[4][5:0]; //v3x
-        model_out[24:19] <= negate_pipe[2][0] ? negate_divide[5][5:0] : divide_out[5][5:0]; //v3y
+        model_out[18:10] <= z_max_pipe[5];
+        model_out[54:49] <= negate_pipe[5][5] ? negate_divide[0][5:0] : divide_out[0][5:0]; //v1x
+        model_out[48:43] <= negate_pipe[5][4] ? negate_divide[1][5:0] : divide_out[1][5:0]; //v1y 
+        model_out[42:37] <= negate_pipe[5][3] ? negate_divide[2][5:0] : divide_out[2][5:0]; //v2x
+        model_out[36:31] <= negate_pipe[5][2] ? negate_divide[3][5:0] : divide_out[3][5:0]; //v2y
+        model_out[30:25] <= negate_pipe[5][1] ? negate_divide[4][5:0] : divide_out[4][5:0]; //v3x
+        model_out[24:19] <= negate_pipe[5][0] ? negate_divide[5][5:0] : divide_out[5][5:0]; //v3y
       end
     end
   end
