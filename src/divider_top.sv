@@ -20,7 +20,7 @@ module divider_top #(
   generate 
     genvar i;
     for (i=0; i<SIZE; i=i+1) begin
-      divider #(
+      divider14 #(
         .WIDTH(WIDTH)
       ) divide (
         .clk_in(clk),
