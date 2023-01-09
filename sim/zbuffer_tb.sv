@@ -6,13 +6,13 @@ module zbuffer_tb;
   logic rst;
 
   logic valid_in;
-  logic [27:0] pixel_in;
+  logic [30:0] pixel_in;
 
   logic valid_out;
   logic [11:0] pixel_addr_out;
   logic [9:0] pixel_out;
   
-  logic [27:0] pixel_in_arr [7:0];
+  logic [30:0] pixel_in_arr [7:0];
   /* A quick note about this simulation! Most waveform viewers
    * (including GTKWave) don't display arrays in their output
    * unless the array is packed along all dimensions. This is
@@ -22,8 +22,8 @@ module zbuffer_tb;
   */
 
   zbuffer #(
-    .SIZE(),
-    .WIDTH()
+    .SIZE(64),
+    .WIDTH(9)
   ) uut (
     .clk(clk),
     .rst(rst),
@@ -46,14 +46,14 @@ module zbuffer_tb;
     clk = 0;
     rst = 0;
     //set test pixel_in values
-    pixel_in_arr[0] = 28'h0000001;
-    pixel_in_arr[1] = 28'h0400002;
-    pixel_in_arr[2] = 28'h0800003;
-    pixel_in_arr[3] = 28'h1000004;
-    pixel_in_arr[4] = 28'h2000005;
-    pixel_in_arr[5] = 28'h3000006;
-    pixel_in_arr[6] = 28'h4000007;
-    pixel_in_arr[7] = 28'h5001008;
+    pixel_in_arr[0] = 31'h00000001;
+    pixel_in_arr[1] = 31'h04000002;
+    pixel_in_arr[2] = 31'h08000003;
+    pixel_in_arr[3] = 31'h06000004;
+    pixel_in_arr[4] = 31'h00100005;
+    pixel_in_arr[5] = 31'h03000006;
+    pixel_in_arr[6] = 31'h04100007;
+    pixel_in_arr[7] = 31'h05001008;
     #20;
     rst = 1;
     #20;
@@ -97,7 +97,7 @@ module zbuffer_tb;
 
     $display("test 3: no reset, test pixel with higher depth (should not pull up valid");
     valid_in = 1;
-    pixel_in = 28'h5002008;
+    pixel_in = 31'h0500A008;
     #60;
     $display("valid out ", valid_out);
 
